@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#171614" media="(prefers-color-scheme: dark)">
+  <title>Tulo — simulador</title>
+  <link rel="stylesheet" href="/web/style.css">
+</head>
+<body>
+  <header>
+    <h1>Tulo</h1>
+    <p>Simulador · pantalla redonda de 466 × 466 px (AMOLED 1,75″)</p>
+  </header>
+
+  <main>
+    <section class="escenario" aria-label="Tulo">
+      <div class="carcasa" id="carcasa">
+        <div class="flor" id="flor"></div>
+        <div class="ventana" id="ventana">
+          <canvas id="pantalla" width="466" height="466" aria-label="Cara de Tulo"></canvas>
+        </div>
+      </div>
+      <p class="bocadillo" id="bocadillo" aria-live="polite">…</p>
+      <button id="parar-alarma" class="alarma" hidden>⏰ Parar la alarma</button>
+      <form id="orden" autocomplete="off">
+        <label for="texto">Dile algo, escrito o hablado</label>
+        <div class="fila">
+          <input id="texto" type="text" placeholder="temporizador de la pasta de diez minutos · recuérdame a las seis llamar a mamá">
+          <button type="submit">Enviar</button>
+          <button type="button" id="hablar" aria-pressed="false">Hablar</button>
+        </div>
+      </form>
+      <label class="interruptor"><input type="checkbox" id="sonido"> Sonidos</label>
+      <label class="interruptor"><input type="checkbox" id="camara"> Cámara: te sigue, ve gestos, que bebes y que te concentras</label>
+      <div class="visor" id="visor" hidden>
+        <video id="video" muted playsinline></video>
+        <p id="camara-estado"></p>
+      </div>
+      <p class="estado" id="red-limites" hidden></p>
+      <!-- Abrir en el móvil (web/red.mjs): solo se ve con PACOLO_LAN=1 o desde el móvil. -->
+      <div class="red" id="red" hidden>
+        <h2>En el móvil</h2>
+        <div class="red-pc" id="red-pc" hidden>
+          <canvas id="red-qr" width="160" height="160" aria-label="QR para abrir Tulo en el móvil"></canvas>
+          <div>
+            <p class="estado">Código</p>
+            <p class="red-codigo" id="red-codigo"></p>
+            <p class="estado"><code id="red-url"></code></p>
+          </div>
+        </div>
+        <form class="fila-form" id="red-form" autocomplete="off" hidden>
+          <input type="text" id="red-entrada" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="Código del PC (6 cifras)" aria-label="Código del PC">
+          <button>Conectar</button>
+        </form>
+        <p class="estado" id="red-estado"></p>
+        <button type="button" id="red-olvidar" hidden>Olvidar el código</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Dónde está · propuesta</h2>
+      <div class="botones" id="modo">
+        <button data-modo="stand" aria-pressed="true">En el stand (imán)</button>
+        <button data-modo="llavero" aria-pressed="false">De llavero</button>
+        <button id="pasear" disabled>Andar 5 min</button>
+        <button id="cruzarse" disabled>Cruzarse con otro Tulo</button>
+        <button id="vaciar">Batería al 2 % (prueba)</button>
+      </div>
+      <label class="interruptor"><input type="checkbox" id="enchufado" checked> Stand enchufado</label>
+      <label class="interruptor"><input type="checkbox" id="movil-cerca" checked> Móvil cerca (de llavero, le pasa lo que no entiende)</label>
+      <p class="estado"><span id="aparato-estado"></span> · Batería (cifras inventadas): <strong id="bateria">100 %</strong></p>
+
+      <h2>Mover el llavero · propuesta</h2>
+      <p class="estado">Hace de acelerómetro (D-043, D-044): de pie, los ojos siguen rectos aunque lo gires; tumbado boca arriba, miran hacia el borde que levantas. Solo la cara: las listas y el primer encendido salen derechos.</p>
+      <div class="botones" role="radiogroup" aria-label="Cómo está">
+        <label class="interruptor"><input type="radio" name="i-postura" value="pie" checked> De pie</label>
+        <label class="interruptor"><input type="radio" name="i-postura" value="plano"> Tumbado boca arriba</label>
+      </div>
+      <label class="deslizador">Girado <input type="range" id="i-giro" min="-180" max="180" value="0"> <span id="i-giro-v">0°</span></label>
+      <label class="deslizador">Borde de arriba levantado <input type="range" id="i-arriba" min="-45" max="45" value="0"> <span id="i-arriba-v">0°</span></label>
+      <label class="deslizador">Borde derecho levantado <input type="range" id="i-derecha" min="-45" max="45" value="0"> <span id="i-derecha-v">0°</span></label>
+      <label class="interruptor"><input type="checkbox" id="i-girar" checked> Girar el dibujo del llavero con él</label>
+      <div class="botones"><button type="button" id="i-recto">Ponerlo recto</button><button type="button" id="i-sensor">Usar el sensor de este móvil</button></div>
+      <p class="estado" id="i-estado"></p>
+
+      <h2>Necesidades</h2>
+      <div class="barras">
+        <label>Energía <span id="v-energia"></span><meter id="m-energia" min="0" max="100" low="20" optimum="80"></meter></label>
+        <label>Saciedad <span id="v-saciedad"></span><meter id="m-saciedad" min="0" max="100" low="20" optimum="80"></meter></label>
+        <label>Ánimo <span id="v-animo"></span><meter id="m-animo" min="0" max="100" low="25" optimum="80"></meter></label>
+      </div>
+      <p class="estado">Cara: <strong id="cara">reposo</strong> · <span id="temporizadores">sin avisos</span></p>
+      <ul id="avisos" class="avisos"></ul>
+
+      <h2>Concentración · así come</h2>
+      <div class="botones" id="foco">
+        <button data-s="1500">25 min</button>
+        <button data-s="300">5 min</button>
+        <button data-s="10">10 s (prueba)</button>
+        <button id="cancelar-foco" disabled>Cancelar</button>
+      </div>
+      <p class="estado" id="foco-estado"></p>
+
+      <h2>Sus necesidades son las tuyas</h2>
+      <div class="cuidados" id="cuidados">
+        <p><span id="e-agua"></span> <button data-cuidado="agua">He bebido</button></p>
+        <p><span id="e-estirar"></span> <button data-cuidado="estirar">Me he levantado</button></p>
+        <p><label for="hora-dormir">Hora de dormir</label> <input type="time" id="hora-dormir"></p>
+      </div>
+
+      <h2>Acciones</h2>
+      <div class="botones" id="acciones">
+        <button data-accion="acariciar">Acariciar</button>
+        <button data-accion="dormir">Dormir</button>
+        <button data-accion="despertar">Despertar</button>
+        <button data-accion="agitar">Agitar</button>
+      </div>
+
+      <h2>Misiones</h2>
+      <ul id="misiones"></ul>
+      <div class="botones">
+        <button id="abrir-caja" disabled>Abrir caja</button>
+        <span class="estado" id="cajas"></span>
+      </div>
+
+      <h2>Skins</h2>
+      <div class="rejilla" id="skins"></div>
+      <div class="probar">
+        <span class="estado">Probar sin tenerla:</span>
+        <label>forma <select id="probar-forma"></select></label>
+        <label>ojo izquierdo <select id="probar-izq"></select></label>
+        <label>derecho <select id="probar-der"></select></label>
+        <button id="probar-quitar" hidden>Volver a la mía</button>
+        <span class="estado" id="probar-info"></span>
+      </div>
+
+      <h2>Mercado · simulado</h2>
+      <p class="estado">Los demás usuarios son inventados y no se mueve dinero. El saldo no sale de aquí: solo sirve para comprar skins.</p>
+      <div class="botones">
+        <span class="estado">Saldo: <strong id="saldo">0,00 €</strong></span>
+        <button id="recargar">Recargar 5,00 € (de mentira)</button>
+      </div>
+      <form id="venta" class="venta" autocomplete="off">
+        <label>Vender <select id="skin-venta"></select></label>
+        <label>por <input id="precio-venta" type="text" inputmode="decimal" size="6"> €</label>
+        <button id="vender" type="submit">Poner a la venta</button>
+        <span class="estado" id="neto-venta"></span>
+      </form>
+      <h3>Tus anuncios</h3>
+      <ul id="mis-anuncios" class="anuncios"></ul>
+      <h3>En venta</h3>
+      <ul id="anuncios" class="anuncios"></ul>
+      <p class="estado" id="mercado-cuentas"></p>
+
+      <h2>Hábitos · de Troko</h2>
+      <div class="botones">
+        <button id="ver-habitos">Ver lista en Tulo</button>
+        <button id="ver-progreso">Progreso de hoy</button>
+        <button id="ver-semana">Progreso semanal</button>
+      </div>
+      <div class="habitos-cabecera">
+        <div class="anillo" id="habitos-anillo" style="--pct: 0"><span id="habitos-pct">0 %</span></div>
+        <div>
+          <p class="estado" id="habitos-resumen"></p>
+          <div class="semana" id="habitos-semana" aria-label="Últimos 7 días"></div>
+        </div>
+      </div>
+      <ul id="habitos-lista" class="avisos"></ul>
+      <form id="habito-form" class="fila-form" autocomplete="off">
+        <input type="text" id="h-titulo" placeholder="Hábito (leer, beber agua…)" aria-label="Nombre del hábito">
+        <input type="text" id="h-objetivo" placeholder="Objetivo (30 min)" aria-label="Objetivo">
+        <input type="time" id="h-hora" aria-label="Hora para preguntarte">
+        <label class="interruptor"><input type="checkbox" id="h-semanal"> Semanal</label>
+        <button>Añadir</button>
+      </form>
+
+      <h2>Tareas · de Troko</h2>
+      <div class="botones"><button id="ver-tareas">Ver tareas en Tulo</button></div>
+      <p class="estado" id="tareas-resumen"></p>
+      <ul id="tareas-lista" class="avisos"></ul>
+      <form id="tarea-form" class="fila-form" autocomplete="off">
+        <input type="text" id="t-titulo" placeholder="Tarea (comprar pan…)" aria-label="Tarea">
+        <select id="t-dia" aria-label="Día"><option value="hoy">Hoy</option><option value="manana">Mañana</option></select>
+        <input type="time" id="t-hora" aria-label="Hora (crea un recordatorio)">
+        <select id="t-cat" aria-label="Categoría"><option value="">Categoría: auto</option><option value="trabajo">Trabajo</option><option value="estudio">Estudio</option><option value="personal">Personal</option></select>
+        <button>Añadir</button>
+      </form>
+
+      <h2>Móvil · simulado</h2>
+      <p class="estado" id="movil-estado"></p>
+      <ul id="movil-chat" class="chat" aria-live="polite"></ul>
+      <form id="movil-form" class="fila-form" autocomplete="off">
+        <input type="text" id="movil-texto" placeholder="Escribe a Tulo (con «/» es una orden: /estado)" aria-label="Mensaje desde el móvil">
+        <button>Enviar</button>
+      </form>
+      <label class="interruptor"><input type="checkbox" id="copiar-avisos" checked> Copiar temporizadores, recordatorios y alarmas al móvil</label>
+
+      <h2>Pantalla y voz · de Troko</h2>
+      <label class="interruptor">Brillo <input type="range" id="brillo" min="10" max="100" step="5" value="100"> <span id="brillo-valor">100 %</span></label>
+      <div class="botones" id="tema">
+        <button data-tema="oscuro" aria-pressed="true">Tema oscuro</button>
+        <button data-tema="claro" aria-pressed="false">Tema claro</button>
+      </div>
+      <label class="interruptor"><input type="checkbox" id="reposo"> Reposo: solo atiende si le llamas «Tulo»</label>
+
+      <h2>Conectores · propuesta</h2>
+      <h3>Pomodoro</h3>
+      <div class="botones" id="pomodoro">
+        <button data-po="normal">Pomodoro 25 / 5</button>
+        <button data-po="prueba">De prueba (20 s / 10 s)</button>
+        <button id="parar-pomodoro" disabled>Parar</button>
+      </div>
+      <p class="estado" id="pomodoro-estado">Sin pomodoro.</p>
+
+      <h3>Calendario</h3>
+      <div class="botones">
+        <label class="interruptor">Fichero .ics <input type="file" id="ics" accept=".ics,text/calendar"></label>
+        <button id="cal-ejemplo">Calendario de ejemplo</button>
+        <button id="cal-quitar">Quitar</button>
+      </div>
+      <label class="interruptor"><input type="checkbox" id="cal-google"> Calendario de Google (en vivo, cada 10 min; la dirección secreta va en el fichero .env del puente)</label>
+      <p class="estado" id="cal-estado">Sin calendario.</p>
+      <ul id="citas" class="avisos"></ul>
+
+      <h3>Notificaciones del PC</h3>
+      <label class="interruptor"><input type="checkbox" id="no-molestar" checked> No molestar durante un bloque (las guarda para después)</label>
+      <div class="botones"><button id="notif-ejemplo">Notificación de ejemplo</button></div>
+      <p class="estado">Cualquier programa del PC puede mandarlas: <code>POST /api/notificar</code> con JSON <code>{"app", "texto"}</code>.</p>
+      <ul id="notificaciones" class="avisos"></ul>
+
+      <h3>Música del PC</h3>
+      <label class="interruptor"><input type="checkbox" id="ver-musica"> Ver la música del PC (Spotify, navegador…)</label>
+      <div class="botones" id="musica-botones">
+        <button data-m="anterior" aria-label="Anterior">⏮</button>
+        <button data-m="pausa" aria-label="Pausa">⏸</button>
+        <button data-m="play" aria-label="Seguir">▶</button>
+        <button data-m="siguiente" aria-label="Siguiente">⏭</button>
+      </div>
+      <p class="estado" id="musica-estado">Apagado.</p>
+
+      <h2>Para probar</h2>
+      <div class="botones" id="velocidad">
+        <button data-v="1" aria-pressed="true">Necesidades a ritmo real</button>
+        <button data-v="60" aria-pressed="false">× 60</button>
+        <button data-v="600" aria-pressed="false">× 600</button>
+        <button id="reiniciar" title="Tulo vuelve a salir de fábrica: le tocan otros ojos y se ve el primer encendido">Reiniciar todo</button>
+        <button id="primer-prueba" title="Enseña la animación con unos ojos al azar, sin cambiar los tuyos">Ver el primer encendido (prueba)</button>
+      </div>
+      <div class="botones" id="distraer">
+        <button data-d="mosca">Soltar una mosca</button>
+        <button data-d="pelota">Lanzar una pelota</button>
+      </div>
+
+      <h2>Expresiones</h2>
+      <div class="botones" id="expresiones"></div>
+
+      <h2>Aspecto</h2>
+      <div class="colores">
+        <label>Carcasa <input type="color" id="c-carcasa"></label>
+        <label>Pantalla <input type="color" id="c-pantalla"></label>
+      </div>
+
+      <h2>Registro</h2>
+      <ol id="registro" reversed></ol>
+    </section>
+  </main>
+
+  <script type="module" src="/web/app.mjs"></script>
+</body>
+</html>

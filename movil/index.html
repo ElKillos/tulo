@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <title>Tulo</title>
+  <!-- App del móvil (D-049): se añade a la pantalla de inicio desde Safari y se abre sin barras. -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Tulo">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="./iconos/tulo-180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./iconos/tulo-192.png">
+  <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#171614" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="../web/style.css">
+  <link rel="stylesheet" href="./movil.css">
+</head>
+<body data-activa="tulo" data-cargando>
+  <p class="mv-aviso" id="mv-aviso" role="status" aria-live="polite" hidden></p>
+  <div id="mv-app"><p class="mv-cargando" id="mv-cargando">Despertando a Tulo…</p></div>
+
+  <!-- Lo que es de la app y no del simulador: va en la pestaña «Más». -->
+  <template id="mv-tarjeta-app">
+    <section class="mv-grupo mv-app-info" data-pestana="mas">
+      <h2>Esta app</h2>
+      <p class="estado" id="mv-instalar" hidden>Para tenerla como una app: en Safari, toca <strong>Compartir</strong> y luego <strong>«Añadir a pantalla de inicio»</strong>.</p>
+      <p class="estado" id="mv-instalada" hidden>Abierta desde la pantalla de inicio.</p>
+      <p class="estado">Sin conexión: <strong id="mv-sw">comprobando…</strong></p>
+      <p class="estado" id="mv-nativo" hidden>App de iPhone: los avisos también suenan con la app cerrada.</p>
+      <p class="estado" id="mv-cerrada">Temporizadores, alarmas y bloques solo avisan con Tulo abierto en pantalla.</p>
+      <p class="estado" id="mv-sin-pc" hidden>Aquí no hay ordenador detrás: la música, las notificaciones y el calendario en vivo del PC no están. Lo demás va igual.</p>
+      <p class="estado">Este Tulo vive en este teléfono: no es el mismo que el de tu ordenador. <span id="mv-version"></span></p>
+    </section>
+  </template>
+
+  <nav class="mv-barra" id="mv-barra" aria-label="Secciones"></nav>
+  <script type="module" src="./arranque.mjs"></script>
+</body>
+</html>
