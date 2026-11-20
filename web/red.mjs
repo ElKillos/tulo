@@ -117,7 +117,9 @@ function pintar() {
       return;
     }
     // Por https si el puente lo tiene: así el móvil da su sensor de movimiento (D-043, D-044).
-    const url = infoPc.https ? `https://${primera.direccion}:${infoPc.https}/` : `http://${primera.direccion}:${infoPc.puerto}/`;
+    // `qr` lo da el puente: '/movil/' si se arrancó con --movil (la app del móvil), '/' si no.
+    const ruta = infoPc.qr === '/movil/' ? 'movil/' : '';
+    const url = `${infoPc.https ? `https://${primera.direccion}:${infoPc.https}/` : `http://${primera.direccion}:${infoPc.puerto}/`}${ruta}`;
     $('red-codigo').textContent = infoPc.codigo;
     $('red-url').textContent = url;
     pintarQr($('red-qr'), `${url}#codigo=${infoPc.codigo}`);

@@ -7,7 +7,7 @@
 // ficheros de la app, que se guardan al instalar. Servida por el puente
 // (server.mjs) no hay lista: se guarda lo que se va pidiendo.
 
-const VERSION = '6ca95a9f36e3';
+const VERSION = '0bd47fcf1428';
 const PREFIJO = 'tulo-movil-';
 const CACHE = PREFIJO + VERSION;
 

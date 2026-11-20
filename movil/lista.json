@@ -1,5 +1,5 @@
 {
- "version": "6ca95a9f36e3",
+ "version": "0bd47fcf1428",
  "ficheros": [
   "./",
   "../core/aparato.mjs",
@@ -38,6 +38,7 @@
   "./movil.css",
   "./nativo.mjs",
   "./pestanas.mjs",
+  "./reintento.mjs",
   "../web/app.mjs",
   "../web/camara.mjs",
   "../web/face.mjs",

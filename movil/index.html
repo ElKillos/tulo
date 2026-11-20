@@ -21,9 +21,18 @@
   <p class="mv-aviso" id="mv-aviso" role="status" aria-live="polite" hidden></p>
   <div id="mv-app"><p class="mv-cargando" id="mv-cargando">Despertando a Tulo…</p></div>
 
-  <!-- Lo que es de la app y no del simulador: va en la pestaña «Más». -->
-  <template id="mv-tarjeta-app">
-    <section class="mv-grupo mv-app-info" data-pestana="mas">
+  <!-- Lo que es de la app y no del simulador: la pestaña «Más» (un menú y una pantalla por cosa). -->
+  <template id="mv-mas">
+    <header class="mv-cabecera" id="mv-cabecera" data-pestana="mas">
+      <button type="button" id="mv-volver" aria-label="Volver a Más">‹ Más</button>
+      <h2 id="mv-titulo"></h2>
+    </header>
+    <nav class="mv-menu" id="mv-menu" data-pestana="mas" aria-label="Más"></nav>
+    <p class="estado mv-nota" data-pestana="mas" data-pantalla="pc" id="mv-pc-nada">Aquí no hay ordenador detrás. Las notificaciones y la música del PC salen cuando abres Tulo desde tu ordenador por la wifi (<code>node server.mjs --lan --movil</code> y escanear el QR).</p>
+    <section class="mv-grupo" data-pestana="mas" data-pantalla="pc" id="mv-caja-red"></section>
+    <p class="estado mv-nota" data-pestana="mas" data-pantalla="laboratorio">Paneles del simulador para probar a Tulo: ritmo acelerado, caras, stand o llavero simulado. No son parte de la app acabada.</p>
+    <p class="estado" id="mv-nota-sensor">Actívalo y vuelve a la pestaña Tulo: tumbado, los ojos miran hacia el borde que levantas; de pie, siguen rectos aunque gires el teléfono. Safari pide permiso la primera vez y solo lo da en una dirección https.</p>
+    <section class="mv-grupo mv-app-info" data-pestana="mas" data-pantalla="app">
       <h2>Esta app</h2>
       <p class="estado" id="mv-instalar" hidden>Para tenerla como una app: en Safari, toca <strong>Compartir</strong> y luego <strong>«Añadir a pantalla de inicio»</strong>.</p>
       <p class="estado" id="mv-instalada" hidden>Abierta desde la pantalla de inicio.</p>
